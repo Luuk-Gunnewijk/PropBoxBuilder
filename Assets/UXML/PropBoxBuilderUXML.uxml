@@ -9,6 +9,7 @@
         <ui:Foldout text="optionsMenu" name="optionsMenu" binding-path="optionsMenuField" class="section" style="background-color: rgba(0, 0, 0, 0); -unity-background-scale-mode: stretch-to-fill; -unity-font-style: bold; flex-direction: column; flex-wrap: wrap; justify-content: flex-start; align-self: auto; align-items: stretch;">
             <ui:Slider label="Strength" value="0" high-value="100" name="StrengthSlider" binding-path="StrengthSlider" focusable="true" picking-mode="Ignore" direction="Horizontal" show-input-field="true" style="-unity-font-style: normal; flex-direction: row; flex-wrap: nowrap; justify-content: flex-start; align-items: stretch; align-self: auto; padding-top: 6px; padding-right: 6px; padding-bottom: 6px; padding-left: 6px;" />
             <ui:Slider label="Spacing" value="0" high-value="100" name="SpacingSlider" binding-path="SpacingSlider" focusable="true" picking-mode="Ignore" direction="Horizontal" show-input-field="true" style="-unity-font-style: normal; flex-direction: row; flex-wrap: nowrap; justify-content: flex-start; align-items: stretch; align-self: auto; padding-top: 6px; padding-right: 6px; padding-bottom: 6px; padding-left: 6px;" />
+            <ui:Toggle label="Turn off spacing" name="ToggleSpacing" binding-path="ToggleSpacing" style="-unity-font-style: normal;" />
         </ui:Foldout>
     </ui:VisualElement>
     <ui:VisualElement name="Container3" class="section" style="flex-grow: 1;">

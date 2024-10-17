@@ -11,7 +11,6 @@ using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 using Label = System.Reflection.Emit.Label;
-using Toggle = UnityEngine.UI.Toggle;
 
 [CustomEditor(typeof(PropBoxBuilderStats))]
 public class PropBoxBuilderMain : Editor
@@ -21,6 +20,7 @@ public class PropBoxBuilderMain : Editor
     private SerializedProperty _prefabListProperty;
     private SerializedProperty _strengthSliderProperty;
     private SerializedProperty _spacingSliderProperty;
+    private SerializedProperty _toggleSpacing;
     [SerializeField] private VisualTreeAsset _visualTreeAsset;
     [SerializeField] private GameObject targetBox;
     
@@ -37,6 +37,7 @@ public class PropBoxBuilderMain : Editor
         _prefabListProperty = serializedObject.FindProperty("ListOfPrefabs");
         _strengthSliderProperty = serializedObject.FindProperty("strengthValue");
         _spacingSliderProperty = serializedObject.FindProperty("SpacingValue");
+        _toggleSpacing = serializedObject.FindProperty("toggleSpacing");
     }
 
     public override VisualElement CreateInspectorGUI()
@@ -74,6 +75,18 @@ public class PropBoxBuilderMain : Editor
                 serializedObject.ApplyModifiedProperties(); 
             });
         }
+        
+        var toggleSpacing = root.Q<Toggle>("ToggleSpacing");
+        if (toggleSpacing != null)
+        {
+            toggleSpacing.BindProperty(_toggleSpacing);
+            toggleSpacing.RegisterCallback<ChangeEvent<bool>>(evt =>
+            {
+                _toggleSpacing.boolValue = evt.newValue;
+                serializedObject.ApplyModifiedProperties();
+            });
+        }
+
         
         var prefabListField = root.Q<PropertyField>("ListOfPrefabs");
         if (prefabListField != null)

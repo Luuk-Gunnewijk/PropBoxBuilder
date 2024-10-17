@@ -12,6 +12,8 @@ public class PropBoxBuilderBox : MonoBehaviour
 {
     private PropBoxBuilderStats _propBoxBuilderStats;
 
+    private GameObject instantiatedObject; // make sure they work in both for loops
+
     private bool isRayHittingCollider;
     private float amount;
     private Vector3 _MyY;
@@ -28,39 +30,58 @@ public class PropBoxBuilderBox : MonoBehaviour
     }
 
     public void MyProps()
-    {
-        if (!isRayHittingCollider) { return; }
+   {
+       if (!isRayHittingCollider) { return; }
+   
+       Vector3 boxSize = transform.localScale;
+       Vector3 boxCenter = transform.position;
+   
+       if (_propBoxBuilderStats.toggleSpacing)
+       {
+           for (int i = 0; i < Mathf.FloorToInt(amount); i++)
+           {
+               Vector3 randomPosition = new Vector3(
+                   Random.Range(boxCenter.x - boxSize.x / 2, boxCenter.x + boxSize.x / 2),
+                   _MyY.y,
+                   Random.Range(boxCenter.z - boxSize.z / 2, boxCenter.z + boxSize.z / 2)
+               );
+               
+               int randomPrefabIndex = Random.Range(0, _propBoxBuilderStats.ListOfPrefabs.Count);
+               instantiatedObject = Instantiate(_propBoxBuilderStats.ListOfPrefabs[randomPrefabIndex], randomPosition, quaternion.identity);
+               SetObjectsToGround();
+           }
+       }
+       else
+       {
+           float spacing = Mathf.Max(_propBoxBuilderStats.SpacingValue / 100f * Mathf.Min(boxSize.x, boxSize.z), 0.1f);
+           
+           int propsInX = Mathf.FloorToInt(boxSize.x / spacing);
+           int propsInZ = Mathf.FloorToInt(boxSize.z / spacing);
+           
+           for (int x = 0; x < propsInX; x++)
+           {
+               for (int z = 0; z < propsInZ; z++)
+               {
+                   Vector3 position = new Vector3(
+                       boxCenter.x - boxSize.x / 2 + x * spacing + spacing / 2,
+                       _MyY.y,
+                       boxCenter.z - boxSize.z / 2 + z * spacing + spacing / 2
+                   );
+                   
+                   if (position.x > boxCenter.x + boxSize.x / 2 || position.z > boxCenter.z + boxSize.z / 2)
+                   {
+                       continue;
+                   }
+                   
+                   int randomPrefabIndex = Random.Range(0, _propBoxBuilderStats.ListOfPrefabs.Count);
+                   instantiatedObject = Instantiate(_propBoxBuilderStats.ListOfPrefabs[randomPrefabIndex], position, quaternion.identity);
+                   SetObjectsToGround();
+               }
+           }
+       }
+       DestroyImmediate(gameObject);
+   }
 
-        Vector3 boxSize = transform.localScale;
-        Vector3 boxCenter = transform.position;
-        
-        float spacing = Mathf.Max(_propBoxBuilderStats.SpacingValue / 100f * Mathf.Min(boxSize.x, boxSize.z), 0.1f);
-        
-        int propsInX = Mathf.FloorToInt(boxSize.x / spacing);
-        int propsInZ = Mathf.FloorToInt(boxSize.z / spacing);
-        
-        for (int x = 0; x < propsInX; x++)
-        {
-            for (int z = 0; z < propsInZ; z++)
-            {
-                Vector3 position = new Vector3(
-                    boxCenter.x - boxSize.x / 2 + x * spacing + spacing / 2,
-                    _MyY.y,
-                    boxCenter.z - boxSize.z / 2 + z * spacing + spacing / 2
-                );
-                
-                if (position.x > boxCenter.x + boxSize.x / 2 || position.z > boxCenter.z + boxSize.z / 2)
-                {
-                    continue;
-                }
-                
-                int randomPrefabIndex = Random.Range(0, _propBoxBuilderStats.ListOfPrefabs.Count);
-                Instantiate(_propBoxBuilderStats.ListOfPrefabs[randomPrefabIndex], position, quaternion.identity);
-            }
-        }
-
-        DestroyImmediate(gameObject);
-    }
     
     private void CheckIfThereIsGround()
     {
@@ -92,5 +113,22 @@ public class PropBoxBuilderBox : MonoBehaviour
             amount = (transform.localScale.x + transform.localScale.y + transform.localScale.z) / 100 * _propBoxBuilderStats.strengthValue;
         }
         Debug.Log("My Amount:" + amount);
+    }
+
+    private void SetObjectsToGround()
+    {
+        Collider objectCollider = instantiatedObject.GetComponent<Collider>();
+        
+        Vector3 rayOrigin = instantiatedObject.transform.position + Vector3.up * 0.1f;
+        
+        if (Physics.Raycast(rayOrigin, Vector3.down, out RaycastHit hitInfo, Mathf.Infinity))
+        {
+            if (objectCollider == null || hitInfo.collider != objectCollider)
+            {
+                Vector3 newPosition = instantiatedObject.transform.position;
+                newPosition.y = hitInfo.point.y;
+                instantiatedObject.transform.position = newPosition;
+            }
+        }
     }
 }

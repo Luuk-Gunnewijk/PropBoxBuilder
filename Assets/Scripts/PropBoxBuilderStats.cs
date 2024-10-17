@@ -14,6 +14,7 @@ public class PropBoxBuilderStats : MonoBehaviour
     
     [Range(0, 100)] public float strengthValue;
     [Range(0, 100)] public float SpacingValue;
+    public bool toggleSpacing;
 
     private void Start()
     {
